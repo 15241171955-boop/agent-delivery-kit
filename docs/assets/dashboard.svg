@@ -1,0 +1,98 @@
+<svg viewBox="0 0 900 462" width="900" height="462" xmlns="http://www.w3.org/2000/svg" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif">
+  <rect x="0.5" y="0.5" width="899" height="461" rx="12" fill="#ffffff" stroke="#e5e7eb"/>
+
+  <!-- header -->
+  <text x="32" y="46" font-size="22" font-weight="700" fill="#1f2328">Spec-Gated Delivery — gate dashboard</text>
+  <text x="32" y="70" font-size="13" fill="#656d76">contract add-csv-export · attempt 1 · 2026-06-26T15:30:08</text>
+
+  <!-- overall badge -->
+  <rect x="32" y="84" width="150" height="26" rx="13" fill="#1a7f37"/>
+  <text x="107" y="101" font-size="13" font-weight="700" fill="#ffffff" text-anchor="middle">ALL GREEN  ·  4/4</text>
+
+  <!-- flow strip -->
+  <g>
+    <!-- box 1 -->
+    <rect x="35" y="128" width="185" height="98" rx="10" fill="#ffffff" stroke="#1a7f37" stroke-width="2"/>
+    <circle cx="127" cy="150" r="12" fill="#ffffff" stroke="#1a7f37" stroke-width="1.5"/>
+    <text x="127" y="154.5" font-size="13" font-weight="700" fill="#1a7f37" text-anchor="middle">1</text>
+    <text x="127" y="180" font-size="15" font-weight="600" fill="#1f2328" text-anchor="middle">specify</text>
+    <text x="127" y="196" font-size="11" fill="#656d76" text-anchor="middle">validate_contract</text>
+    <rect x="95" y="203" width="64" height="17" rx="5" fill="#1a7f37"/>
+    <text x="127" y="215" font-size="10.5" font-weight="700" fill="#ffffff" text-anchor="middle">PASS</text>
+
+    <text x="235" y="184" font-size="22" fill="#8c959f" text-anchor="middle">→</text>
+
+    <!-- box 2 -->
+    <rect x="250" y="128" width="185" height="98" rx="10" fill="#ffffff" stroke="#1a7f37" stroke-width="2"/>
+    <circle cx="342" cy="150" r="12" fill="#ffffff" stroke="#1a7f37" stroke-width="1.5"/>
+    <text x="342" y="154.5" font-size="13" font-weight="700" fill="#1a7f37" text-anchor="middle">2</text>
+    <text x="342" y="180" font-size="15" font-weight="600" fill="#1f2328" text-anchor="middle">review</text>
+    <text x="342" y="196" font-size="11" fill="#656d76" text-anchor="middle">coverage_gate</text>
+    <rect x="310" y="203" width="64" height="17" rx="5" fill="#1a7f37"/>
+    <text x="342" y="215" font-size="10.5" font-weight="700" fill="#ffffff" text-anchor="middle">PASS</text>
+
+    <text x="450" y="184" font-size="22" fill="#8c959f" text-anchor="middle">→</text>
+
+    <!-- box 3 -->
+    <rect x="465" y="128" width="185" height="98" rx="10" fill="#ffffff" stroke="#1a7f37" stroke-width="2"/>
+    <circle cx="557" cy="150" r="12" fill="#ffffff" stroke="#1a7f37" stroke-width="1.5"/>
+    <text x="557" y="154.5" font-size="13" font-weight="700" fill="#1a7f37" text-anchor="middle">3</text>
+    <text x="557" y="180" font-size="15" font-weight="600" fill="#1f2328" text-anchor="middle">apply</text>
+    <text x="557" y="196" font-size="11" fill="#656d76" text-anchor="middle">gate_check</text>
+    <rect x="525" y="203" width="64" height="17" rx="5" fill="#1a7f37"/>
+    <text x="557" y="215" font-size="10.5" font-weight="700" fill="#ffffff" text-anchor="middle">PASS</text>
+
+    <text x="665" y="184" font-size="22" fill="#8c959f" text-anchor="middle">→</text>
+
+    <!-- box 4 -->
+    <rect x="680" y="128" width="185" height="98" rx="10" fill="#ffffff" stroke="#1a7f37" stroke-width="2"/>
+    <circle cx="772" cy="150" r="12" fill="#ffffff" stroke="#1a7f37" stroke-width="1.5"/>
+    <text x="772" y="154.5" font-size="13" font-weight="700" fill="#1a7f37" text-anchor="middle">4</text>
+    <text x="772" y="180" font-size="15" font-weight="600" fill="#1f2328" text-anchor="middle">verify</text>
+    <text x="772" y="196" font-size="11" fill="#656d76" text-anchor="middle">dod_check</text>
+    <rect x="740" y="203" width="64" height="17" rx="5" fill="#1a7f37"/>
+    <text x="772" y="215" font-size="10.5" font-weight="700" fill="#ffffff" text-anchor="middle">PASS</text>
+  </g>
+
+  <!-- results table -->
+  <g font-size="12.5">
+    <rect x="30" y="262" width="840" height="146" rx="6" fill="#ffffff" stroke="#d0d7de"/>
+    <rect x="30" y="262" width="840" height="30" fill="#f6f8fa"/>
+    <line x1="30" y1="292" x2="870" y2="292" stroke="#d0d7de"/>
+    <line x1="30" y1="321" x2="870" y2="321" stroke="#d0d7de"/>
+    <line x1="30" y1="350" x2="870" y2="350" stroke="#d0d7de"/>
+    <line x1="30" y1="379" x2="870" y2="379" stroke="#d0d7de"/>
+    <line x1="190" y1="262" x2="190" y2="408" stroke="#d0d7de"/>
+    <line x1="430" y1="262" x2="430" y2="408" stroke="#d0d7de"/>
+    <line x1="540" y1="262" x2="540" y2="408" stroke="#d0d7de"/>
+
+    <!-- header -->
+    <text x="44" y="282" font-weight="600" fill="#1f2328">Stage</text>
+    <text x="204" y="282" font-weight="600" fill="#1f2328">Gate</text>
+    <text x="444" y="282" font-weight="600" fill="#1f2328">Result</text>
+    <text x="554" y="282" font-weight="600" fill="#1f2328">Reasons</text>
+
+    <!-- rows -->
+    <text x="44" y="311" fill="#1f2328">1 · specify</text>
+    <text x="204" y="311" fill="#1f2328" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">validate_contract</text>
+    <text x="444" y="311" fill="#1a7f37" font-weight="700">PASS</text>
+    <text x="554" y="311" fill="#8c959f">—</text>
+
+    <text x="44" y="340" fill="#1f2328">2 · review</text>
+    <text x="204" y="340" fill="#1f2328" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">coverage_gate</text>
+    <text x="444" y="340" fill="#1a7f37" font-weight="700">PASS</text>
+    <text x="554" y="340" fill="#8c959f">—</text>
+
+    <text x="44" y="369" fill="#1f2328">3 · apply</text>
+    <text x="204" y="369" fill="#1f2328" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">gate_check</text>
+    <text x="444" y="369" fill="#1a7f37" font-weight="700">PASS</text>
+    <text x="554" y="369" fill="#8c959f">—</text>
+
+    <text x="44" y="398" fill="#1f2328">4 · verify</text>
+    <text x="204" y="398" fill="#1f2328" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">dod_check</text>
+    <text x="444" y="398" fill="#1a7f37" font-weight="700">PASS</text>
+    <text x="554" y="398" fill="#8c959f">—</text>
+  </g>
+
+  <text x="32" y="438" font-size="11" fill="#8c959f">Generated by kit/scripts/run_pipeline.py · self-contained, no external assets.</text>
+</svg>

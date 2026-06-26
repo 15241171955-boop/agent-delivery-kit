@@ -3,6 +3,8 @@
 **Spec-Gated Delivery** — a stack-agnostic, zero-dependency way to ship work with AI agents through
 four script-judged gates, so "done" is a fact a script checks, not a claim the model makes.
 
+![Gate dashboard](https://raw.githubusercontent.com/15241171955-boop/agent-delivery-kit/main/docs/assets/dashboard.png)
+
 ## Highlights
 
 - **Four-stage gated loop** — specify → review → apply → verify, each ending in a deterministic gate

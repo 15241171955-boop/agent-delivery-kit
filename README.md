@@ -4,6 +4,8 @@
 
 > **Spec-Gated Delivery** — a stack-agnostic, reusable workflow for shipping work with AI agents through four gated stages, where every gate is judged by a deterministic script, not by the model's own say-so.
 
+![Gate dashboard — all four gates green for a verified contract](docs/assets/dashboard.png)
+
 ---
 
 ## What it is
