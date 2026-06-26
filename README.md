@@ -1,10 +1,6 @@
 # agent-delivery-kit
 
-![license](https://img.shields.io/badge/license-MIT-blue) ![python](https://img.shields.io/badge/python-3.x-blue) ![deps](https://img.shields.io/badge/deps-zero-brightgreen) ![tests](https://img.shields.io/badge/tests-passing-brightgreen) ![skills](https://img.shields.io/badge/SKILL.md-compatible-blue)
-
-<!-- After you push, enable the live CI badge by replacing <your-username>:
-[![gates](https://github.com/<your-username>/agent-delivery-kit/actions/workflows/ci.yml/badge.svg)](https://github.com/<your-username>/agent-delivery-kit/actions/workflows/ci.yml)
--->
+[![gates](https://github.com/15241171955-boop/agent-delivery-kit/actions/workflows/ci.yml/badge.svg)](https://github.com/15241171955-boop/agent-delivery-kit/actions/workflows/ci.yml) ![license](https://img.shields.io/badge/license-MIT-blue) ![python](https://img.shields.io/badge/python-3.x-blue) ![deps](https://img.shields.io/badge/deps-zero-brightgreen) ![skills](https://img.shields.io/badge/SKILL.md-compatible-blue)
 
 > **Spec-Gated Delivery** — a stack-agnostic, reusable workflow for shipping work with AI agents through four gated stages, where every gate is judged by a deterministic script, not by the model's own say-so.
 >
