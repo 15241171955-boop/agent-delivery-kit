@@ -1,0 +1,18 @@
+{
+  "id": "fix-negative-quantity-checkout",
+  "intent": "A checkout defect lets a user submit a cart line with a negative quantity, which produces a negative line total and effectively credits the customer. We will reject non-positive quantities at the cart API and surface a validation error so totals stay correct.",
+  "sources": [
+    { "id": "bug-1042", "ref": "tracker/1042", "must_cover": true }
+  ],
+  "entities": [
+    { "name": "CartLineValidator", "kind": "service", "fields": ["quantity", "error"] }
+  ],
+  "acceptance": [
+    { "id": "ac-1", "statement": "Submitting a cart line with quantity <= 0 is rejected with a 422 validation error", "testable": true, "covers": ["bug-1042"], "passed": true },
+    { "id": "ac-2", "statement": "A cart line with a positive quantity still checks out unchanged (no regression)", "testable": true, "covers": ["bug-1042"], "passed": true }
+  ],
+  "confidence": "explicit",
+  "status": "verified",
+  "tasks_open": 0,
+  "tests": { "passed": true, "skipped": false }
+}

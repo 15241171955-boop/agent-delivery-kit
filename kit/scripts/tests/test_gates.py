@@ -3,10 +3,13 @@
 
 Run:  python3 kit/scripts/tests/test_gates.py
 """
+import contextlib
 import copy
+import io
 import json
 import os
 import sys
+import tempfile
 import unittest
 
 HERE = os.path.dirname(os.path.abspath(__file__))
@@ -62,6 +65,24 @@ class GateTests(unittest.TestCase):
         d = copy.deepcopy(self.c); d["sources"][0]["must_cover"] = "true"
         self.assertFalse(validate_contract.check(d)[0])
 
+    def test_validate_rejects_non_string_source_fields(self):
+        d = copy.deepcopy(self.c)
+        d["sources"][0]["id"] = {"bad": 1}
+        d["sources"][0]["ref"] = 123
+        self.assertFalse(validate_contract.check(d)[0])
+
+    def test_validate_rejects_non_string_entity_fields(self):
+        d = copy.deepcopy(self.c)
+        d["entities"][0]["name"] = []
+        d["entities"][0]["kind"] = {}
+        self.assertFalse(validate_contract.check(d)[0])
+
+    def test_validate_rejects_non_string_acceptance_fields(self):
+        d = copy.deepcopy(self.c)
+        d["acceptance"][0]["id"] = {"bad": 1}
+        d["acceptance"][0]["statement"] = []
+        self.assertFalse(validate_contract.check(d)[0])
+
     def test_validate_rejects_covers_not_list(self):
         d = copy.deepcopy(self.c); d["acceptance"][0]["covers"] = "prd-2.1"
         self.assertFalse(validate_contract.check(d)[0])
@@ -85,10 +106,51 @@ class GateTests(unittest.TestCase):
         self.assertFalse(gate_check.check(d)[0])
         self.assertFalse(dod_check.check(d)[0])
 
+    def test_all_gates_reject_non_object_contract(self):
+        # A JSON array / string / number must fail gracefully, not raise.
+        for check in (validate_contract.check, coverage_gate.check,
+                      gate_check.check, dod_check.check):
+            ok, reasons = check([])
+            self.assertFalse(ok)
+            self.assertIn("contract must be a JSON object", reasons)
+
+    def test_downstream_gates_reject_malformed_acceptance_item_without_crashing(self):
+        d = copy.deepcopy(self.c)
+        d["acceptance"] = ["bad-item"]
+        self.assertFalse(validate_contract.check(d)[0])
+        self.assertFalse(gate_check.check(d)[0])
+        self.assertFalse(dod_check.check(d)[0])
+
     # --- ② coverage rejects an uncovered must_cover source ---
     def test_coverage_uncovered_must_cover(self):
         d = copy.deepcopy(self.c)
         d["sources"].append({"id": "new-src", "ref": "x", "must_cover": True})
+        self.assertFalse(coverage_gate.check(d)[0])
+
+    def test_coverage_ignores_non_string_cover_ids_without_crashing(self):
+        d = copy.deepcopy(self.c)
+        d["sources"] = [{"id": "s-1", "ref": "x", "must_cover": True}]
+        d["acceptance"] = [{
+            "id": "ac-1",
+            "statement": "A testable thing happens",
+            "testable": True,
+            "covers": [{"bad": 1}],
+            "passed": False,
+        }]
+        self.assertFalse(validate_contract.check(d)[0])
+        self.assertFalse(coverage_gate.check(d)[0])
+
+    def test_coverage_rejects_non_string_source_id_without_crashing(self):
+        d = copy.deepcopy(self.c)
+        d["sources"] = [{"id": {"bad": 1}, "ref": "x", "must_cover": True}]
+        d["acceptance"] = [{
+            "id": "ac-1",
+            "statement": "A testable thing happens",
+            "testable": True,
+            "covers": ["s-1"],
+            "passed": False,
+        }]
+        self.assertFalse(validate_contract.check(d)[0])
         self.assertFalse(coverage_gate.check(d)[0])
 
     # --- ③ gate_check enforces review + testability before code ---
@@ -141,6 +203,15 @@ class GateTests(unittest.TestCase):
         self.assertFalse(coverage_gate.check(bad)[0])
         self.assertFalse(gate_check.check(bad)[0])
         self.assertFalse(dod_check.check(bad)[0])
+
+    def test_validate_main_handles_unreadable_file(self):
+        # missing file and malformed JSON must exit cleanly (2), not traceback
+        with tempfile.TemporaryDirectory() as tmp, contextlib.redirect_stdout(io.StringIO()):
+            self.assertEqual(validate_contract.main(["x", os.path.join(tmp, "nope.json")]), 2)
+            bad = os.path.join(tmp, "bad.json")
+            with open(bad, "w", encoding="utf-8") as fh:
+                fh.write("{bad json")
+            self.assertEqual(validate_contract.main(["x", bad]), 2)
 
 
 if __name__ == "__main__":

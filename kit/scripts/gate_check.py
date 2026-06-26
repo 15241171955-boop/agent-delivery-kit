@@ -13,10 +13,13 @@ import coverage_gate
 
 
 def check(contract):
-    reasons = []
+    if not isinstance(contract, dict):
+        return (False, ["contract must be a JSON object"])
 
     # Re-derive upstream invariants (don't trust `status` alone).
-    reasons += validate_contract.check(contract)[1]
+    valid, reasons = validate_contract.check(contract)
+    if not valid:
+        return (False, reasons)
     reasons += coverage_gate.check(contract)[1]
 
     # Stage gate.
@@ -38,7 +41,11 @@ def main(argv):
     if len(argv) != 2:
         print("usage: gate_check.py <contract.json>")
         return 2
-    return c.report("gate_check", *check(c.load_contract(argv[1])))
+    contract, err = c.read_contract(argv[1])
+    if err:
+        print("[FAIL] gate_check\n  - %s" % err)
+        return 2
+    return c.report("gate_check", *check(contract))
 
 
 if __name__ == "__main__":

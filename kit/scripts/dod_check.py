@@ -14,10 +14,13 @@ import coverage_gate
 
 
 def check(contract):
-    reasons = []
+    if not isinstance(contract, dict):
+        return (False, ["contract must be a JSON object"])
 
     # Re-derive upstream invariants and require real pipeline progress.
-    reasons += validate_contract.check(contract)[1]
+    valid, reasons = validate_contract.check(contract)
+    if not valid:
+        return (False, reasons)
     reasons += coverage_gate.check(contract)[1]
     if not c.at_least(contract, "applied"):
         reasons.append("status must be 'applied' or later before verification (got %r)"
@@ -46,7 +49,11 @@ def main(argv):
     if len(argv) != 2:
         print("usage: dod_check.py <contract.json>")
         return 2
-    return c.report("dod_check", *check(c.load_contract(argv[1])))
+    contract, err = c.read_contract(argv[1])
+    if err:
+        print("[FAIL] dod_check\n  - %s" % err)
+        return 2
+    return c.report("dod_check", *check(contract))
 
 
 if __name__ == "__main__":

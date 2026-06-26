@@ -4,6 +4,9 @@
 graphify-out/
 .agent-state/
 *.runtime.json
+# run_pipeline outputs (dashboard + machine-readable result)
+report.html
+run.json
 
 # --- Python ---
 __pycache__/

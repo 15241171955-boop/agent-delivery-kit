@@ -40,27 +40,30 @@ intent ─▶ ① SPECIFY ─▶ ② REVIEW ─▶ ③ APPLY ─▶ ④ VERIFY �
 
 ```
 agent-delivery-kit/
-├── docs/         # methodology article, concepts, architecture, adapting guide
+├── docs/         # article, concepts, architecture, cookbook, adapting guide
 ├── kit/          # the runnable scaffold
 │   ├── skills/   # specify · review · apply · verify (portable SKILL.md)
 │   ├── shared/   # contract schema, rule sources, definition of done
 │   ├── commands/ # thin entrypoints
-│   ├── scripts/  # the 4 gate scripts + stdlib tests (Python 3, zero deps)
-│   ├── extensions/  # optional: dual-track governance, simplified orchestrator
+│   ├── scripts/  # 4 gate scripts + run_pipeline orchestrator + stdlib tests (Python 3, zero deps)
+│   ├── extensions/  # optional: dual-track governance, pipeline-driver
 │   └── context-map.yaml
-└── examples/     # a minimal sample contract (shape only, stack-free)
+└── examples/     # sample + bad contract, and worked feature / bug-fix walkthroughs
 ```
 
 ## Quickstart
 
 ```bash
-# from this repo — point $ADK at the kit, then run the gate self-tests (no deps)
+# from this repo — point $ADK at the kit, then run the self-tests (no deps)
 export ADK="$PWD/kit"
-python3 "$ADK/scripts/tests/test_gates.py"
+python3 -m unittest discover -s "$ADK/scripts/tests" -p "test_*.py"
 
 # watch the gates reject a bad contract, then accept a good one
 python3 "$ADK/scripts/validate_contract.py" examples/contract.bad.json     # FAIL (with reasons)
 python3 "$ADK/scripts/dod_check.py"          examples/contract.sample.json  # PASS
+
+# or run all four at once and see the status board
+python3 "$ADK/scripts/run_pipeline.py" examples/contract.sample.json        # ALL GREEN (4/4)
 
 # read the method
 open docs/article.en.md
@@ -90,12 +93,30 @@ Each skill calls its gate as `"$ADK/scripts/…"` and reads rules via `../../sha
 your agent at the skills folder (or symlinking it) — not flattening it — keeps both valid.** Then fill
 `.delivery/shared/rule-sources.md` with your team's rules.
 
+## Orchestrate & visualize
+
+Run all four gates over a contract and see where it stands — optionally with a self-contained HTML
+dashboard and a machine-readable result:
+
+```bash
+python3 "$ADK/scripts/run_pipeline.py" path/to/contract.json \
+  --max-attempts 5 --retry-delay 10 --report report.html --json run.json
+```
+
+The terminal prints a status board; `report.html` is a shareable gate dashboard (no external assets).
+`--max-attempts` re-loads the contract each try, so an agent or human fixing it between attempts is
+picked up, and the run stops as soon as every gate is green. New here? walk a full feature or bug fix
+in [`examples/`](examples/), and read [`docs/cookbook.md`](docs/cookbook.md) for contract best
+practices and how to extend the gates.
+
 ## How this differs
 
 Deliberately a **micro-kit**: four stages, four ~30-line gate scripts, zero dependencies — not a
 framework. Versus larger spec-driven tools (e.g. GitHub's Spec Kit), the bet is **smaller + more
 auditable + deterministic gates**: the thing that decides "done" is a script you can read in a minute
-and run in CI, not a prompt. Use it on its own, or as the gate layer beside a heavier spec tool.
+and run in CI, not a prompt. The optional `run_pipeline.py` adds a status board and a self-contained
+HTML dashboard — still no framework and no services. Use it on its own, or as the gate layer beside a
+heavier spec tool.
 
 ## Adapting to your stack
 

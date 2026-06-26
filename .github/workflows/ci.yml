@@ -18,8 +18,8 @@ jobs:
         with:
           python-version: "3.x"
 
-      - name: Gate self-tests
-        run: python3 kit/scripts/tests/test_gates.py
+      - name: Self-tests (gates + pipeline)
+        run: python3 -m unittest discover -s kit/scripts/tests -p "test_*.py"
 
       - name: Gates PASS on a good contract
         run: |
@@ -34,3 +34,8 @@ jobs:
           ! python3 kit/scripts/coverage_gate.py    examples/contract.bad.json
           ! python3 kit/scripts/gate_check.py       examples/contract.bad.json
           ! python3 kit/scripts/dod_check.py        examples/contract.bad.json
+
+      - name: Orchestrator green on the sample, blocked on the bad one
+        run: |
+          python3 kit/scripts/run_pipeline.py examples/contract.sample.json
+          ! python3 kit/scripts/run_pipeline.py examples/contract.bad.json --quiet

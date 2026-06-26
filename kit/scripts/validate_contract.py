@@ -15,7 +15,14 @@ def _is_int(v):
     return isinstance(v, int) and not isinstance(v, bool)
 
 
+def _non_empty_string(v):
+    return isinstance(v, str) and bool(v.strip())
+
+
 def check(contract):
+    if not isinstance(contract, dict):
+        return (False, ["contract must be a JSON object"])
+
     reasons = []
 
     for field in c.REQUIRED_FIELDS:
@@ -46,13 +53,18 @@ def check(contract):
             if not (isinstance(s, dict) and all(k in s for k in ("id", "ref", "must_cover"))):
                 reasons.append("sources[%d] needs id, ref, must_cover" % i)
                 continue
+            if not _non_empty_string(s["id"]):
+                reasons.append("sources[%d].id must be a non-empty string" % i)
+            if not _non_empty_string(s["ref"]):
+                reasons.append("sources[%d].ref must be a non-empty string" % i)
             if not isinstance(s["must_cover"], bool):
                 reasons.append("sources[%d].must_cover must be a boolean (got %r)"
                                % (i, s["must_cover"]))
             sid = s["id"]
-            if sid in source_ids:
+            if isinstance(sid, str) and sid in source_ids:
                 reasons.append("duplicate source id: %r" % sid)
-            source_ids.append(sid)
+            if isinstance(sid, str):
+                source_ids.append(sid)
 
     # --- entities: shape ---
     entities = contract.get("entities")
@@ -62,6 +74,11 @@ def check(contract):
         for i, e in enumerate(entities):
             if not (isinstance(e, dict) and all(k in e for k in ("name", "kind"))):
                 reasons.append("entities[%d] needs name, kind" % i)
+                continue
+            if not _non_empty_string(e["name"]):
+                reasons.append("entities[%d].name must be a non-empty string" % i)
+            if not _non_empty_string(e["kind"]):
+                reasons.append("entities[%d].kind must be a non-empty string" % i)
 
     # --- acceptance: shape, types, unique ids, covers reference real sources ---
     acc_ids = []
@@ -73,18 +90,26 @@ def check(contract):
             if not (isinstance(a, dict) and all(k in a for k in ("id", "statement", "testable", "covers"))):
                 reasons.append("acceptance[%d] needs id, statement, testable, covers" % i)
                 continue
+            if not c.is_kebab(a["id"]):
+                reasons.append("acceptance[%d].id must be kebab-case (got %r)" % (i, a["id"]))
+            if not _non_empty_string(a["statement"]):
+                reasons.append("acceptance[%s].statement must be a non-empty string" % a["id"])
             if not isinstance(a["testable"], bool):
                 reasons.append("acceptance[%s].testable must be a boolean" % a["id"])
             aid = a["id"]
-            if aid in acc_ids:
+            if isinstance(aid, str) and aid in acc_ids:
                 reasons.append("duplicate acceptance id: %r" % aid)
-            acc_ids.append(aid)
+            if isinstance(aid, str):
+                acc_ids.append(aid)
             covers = a["covers"]
             if not isinstance(covers, list):
                 reasons.append("acceptance[%s].covers must be a list (got %r)" % (aid, covers))
             else:
                 for cid in covers:
-                    if cid not in source_ids:
+                    if not isinstance(cid, str):
+                        reasons.append("acceptance[%s].covers entries must be strings (got %r)"
+                                       % (aid, cid))
+                    elif cid not in source_ids:
                         reasons.append("acceptance[%s].covers references unknown source id: %r"
                                        % (aid, cid))
 
@@ -111,7 +136,11 @@ def main(argv):
     if len(argv) != 2:
         print("usage: validate_contract.py <contract.json>")
         return 2
-    return c.report("validate_contract", *check(c.load_contract(argv[1])))
+    contract, err = c.read_contract(argv[1])
+    if err:
+        print("[FAIL] validate_contract\n  - %s" % err)
+        return 2
+    return c.report("validate_contract", *check(contract))
 
 
 if __name__ == "__main__":

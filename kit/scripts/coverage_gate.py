@@ -15,6 +15,8 @@ import _contract as c
 
 
 def check(contract):
+    if not isinstance(contract, dict):
+        return (False, ["contract must be a JSON object"])
     reasons = []
     sources = contract.get("sources", []) or []
     acceptance = contract.get("acceptance", []) or []
@@ -24,11 +26,13 @@ def check(contract):
         if isinstance(a, dict):
             covers = a.get("covers")
             if isinstance(covers, list):
-                covered.update(covers)
+                covered.update(cid for cid in covers if isinstance(cid, str))
 
     for s in sources:
-        if isinstance(s, dict) and s.get("must_cover") is True and s.get("id") not in covered:
-            reasons.append("must_cover source not covered by any acceptance: %s" % s.get("id"))
+        sid = s.get("id") if isinstance(s, dict) else None
+        if isinstance(s, dict) and s.get("must_cover") is True:
+            if not isinstance(sid, str) or sid not in covered:
+                reasons.append("must_cover source not covered by any acceptance: %s" % sid)
 
     return (len(reasons) == 0, reasons)
 
@@ -37,7 +41,11 @@ def main(argv):
     if len(argv) != 2:
         print("usage: coverage_gate.py <contract.json>")
         return 2
-    return c.report("coverage_gate", *check(c.load_contract(argv[1])))
+    contract, err = c.read_contract(argv[1])
+    if err:
+        print("[FAIL] coverage_gate\n  - %s" % err)
+        return 2
+    return c.report("coverage_gate", *check(contract))
 
 
 if __name__ == "__main__":

@@ -19,9 +19,23 @@ _KEBAB = re.compile(r"^[a-z0-9]+(-[a-z0-9]+)*$")
 
 
 def load_contract(path):
-    """Load a contract.json from disk (UTF-8)."""
+    """Load a contract.json from disk (UTF-8). Raises on a missing or invalid file."""
     with open(path, "r", encoding="utf-8") as fh:
         return json.load(fh)
+
+
+def read_contract(path):
+    """CLI-safe load. Returns (contract, error): on success error is None; on failure
+    contract is None and error is a human-readable message (so callers print a clean
+    [FAIL] instead of a traceback)."""
+    try:
+        return (load_contract(path), None)
+    except FileNotFoundError:
+        return (None, "no such file: %s" % path)
+    except OSError as exc:
+        return (None, "cannot read %s (%s)" % (path, exc))
+    except json.JSONDecodeError as exc:
+        return (None, "invalid JSON in %s (%s)" % (path, exc))
 
 
 def is_kebab(value):

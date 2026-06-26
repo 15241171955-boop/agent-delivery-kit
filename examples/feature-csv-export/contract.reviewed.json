@@ -1,0 +1,22 @@
+{
+  "id": "add-csv-export",
+  "intent": "Users viewing a data list cannot currently take the data offline for reporting. We will add a CSV export action to the list view so a user can download the rows that match the current filter, including the empty-result case.",
+  "sources": [
+    { "id": "prd-2.1", "ref": "docs/prd.md#2.1-export", "must_cover": true },
+    { "id": "ticket-481", "ref": "tracker/481", "must_cover": true },
+    { "id": "note-ux", "ref": "notes/ux-sync.md", "must_cover": false }
+  ],
+  "entities": [
+    { "name": "ExportButton", "kind": "ui-action", "fields": ["label", "scope"] },
+    { "name": "ExportJob", "kind": "service", "fields": ["filter", "format", "status"] }
+  ],
+  "acceptance": [
+    { "id": "ac-1", "statement": "An Export button is visible on the list toolbar", "testable": true, "covers": ["prd-2.1"], "passed": false },
+    { "id": "ac-2", "statement": "Clicking Export downloads a CSV of the currently filtered rows", "testable": true, "covers": ["prd-2.1", "ticket-481"], "passed": false },
+    { "id": "ac-3", "statement": "Exporting an empty result set yields a header-only CSV with no error", "testable": true, "covers": ["ticket-481"], "passed": false }
+  ],
+  "confidence": "explicit",
+  "status": "reviewed",
+  "tasks_open": 3,
+  "tests": { "passed": false, "skipped": true }
+}
