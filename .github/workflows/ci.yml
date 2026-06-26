@@ -1,0 +1,36 @@
+name: gates
+
+on:
+  push:
+  pull_request:
+
+# Least-privilege token. For stricter supply-chain hardening, pin each action to a commit SHA
+# (e.g. `actions/checkout@<sha>`) instead of a moving tag like @v4.
+permissions:
+  contents: read
+
+jobs:
+  gates:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.x"
+
+      - name: Gate self-tests
+        run: python3 kit/scripts/tests/test_gates.py
+
+      - name: Gates PASS on a good contract
+        run: |
+          python3 kit/scripts/validate_contract.py examples/contract.sample.json
+          python3 kit/scripts/coverage_gate.py    examples/contract.sample.json
+          python3 kit/scripts/gate_check.py       examples/contract.sample.json
+          python3 kit/scripts/dod_check.py        examples/contract.sample.json
+
+      - name: Gates REJECT a bad contract (each must exit non-zero)
+        run: |
+          ! python3 kit/scripts/validate_contract.py examples/contract.bad.json
+          ! python3 kit/scripts/coverage_gate.py    examples/contract.bad.json
+          ! python3 kit/scripts/gate_check.py       examples/contract.bad.json
+          ! python3 kit/scripts/dod_check.py        examples/contract.bad.json

@@ -1,0 +1,17 @@
+{
+  "id": "Bad_Example",
+  "intent": "too short",
+  "sources": [
+    { "id": "prd-9", "ref": "docs/prd.md#9", "must_cover": true }
+  ],
+  "entities": [
+    { "name": "Thing", "kind": "model" }
+  ],
+  "acceptance": [
+    { "id": "ac-1", "statement": "略", "testable": false, "covers": [], "passed": false }
+  ],
+  "confidence": "explicit",
+  "status": "draft",
+  "tasks_open": 3,
+  "tests": { "passed": false, "skipped": true }
+}

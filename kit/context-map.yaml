@@ -1,0 +1,42 @@
+version: 1
+purpose: >-
+  Task-to-context routing for Spec-Gated Delivery. Given a task type, tells the agent which
+  stages to run and which shared rule sources to read. The contract.json is authoritative;
+  this map is navigation only.
+
+# All paths below are relative to THIS file's directory (the kit root). When the kit is installed
+# as `.delivery/`, set `export ADK=<path-to-that-dir>` and invoke gates as `$ADK/scripts/<gate>.py`.
+paths_relative_to: kit-root
+
+invariants_reminder:
+  - single_source_of_truth: shared/* is the only place rules live
+  - machine_readable_handoff: contract.json links specify -> apply
+  - deterministic_gates: scripts/* decide, the model does not self-certify
+  - composition_over_duplication: orchestrate existing tooling, do not reimplement
+  - derived_artifacts_excluded: see .gitignore
+
+stages:
+  specify: { skill: skills/specify/SKILL.md, gate: scripts/validate_contract.py }
+  review:  { skill: skills/review/SKILL.md,  gate: scripts/coverage_gate.py }
+  apply:   { skill: skills/apply/SKILL.md,   gate: scripts/gate_check.py }
+  verify:  { skill: skills/verify/SKILL.md,  gate: scripts/dod_check.py }
+
+task_routes:
+  new_feature_or_change:
+    run: [specify, review, apply, verify]
+    must_read: [shared/contract-schema.md, shared/rule-sources.md]
+  bugfix:
+    run: [specify, review, apply, verify]   # same gates; specify may be a compact contract
+    note: "Smaller contract is fine, but no gate is skipped (no 'it's just a small fix' bypass)."
+    must_read: [shared/definition-of-done.md]
+  refactor:
+    run: [specify, review, apply, verify]
+    must_read: [shared/rule-sources.md]
+  change_the_kit_itself:
+    note: "Editing skills/scripts/shared = governance change. Keep it separate from product work."
+    must_read: [extensions/dual-track-governance.md]
+
+red_lines:
+  - "No code edit in ③ before gate_check.py exits 0."
+  - "No success wording in ④ while dod_check.py is red."
+  - "A skipped/absent test suite is 'not verified', never 'passed'."

@@ -1,0 +1,28 @@
+# --- Derived artifacts (invariant #5: never commit) ---
+# Indexes, caches, runtime state produced by agents/tools
+.codegraph/
+graphify-out/
+.agent-state/
+*.runtime.json
+
+# --- Python ---
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+venv/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# --- Node (only if you wire JS tooling) ---
+node_modules/
+npm-debug.log*
+pnpm-debug.log*
+
+# --- OS / editor ---
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp
