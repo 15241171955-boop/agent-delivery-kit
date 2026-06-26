@@ -15,7 +15,7 @@ exposes a pure `check(contract) -> (ok, reasons)` and a CLI that exits 0 (pass) 
 ## Run
 
 ```bash
-python3 kit/scripts/tests/test_gates.py                       # self-tests (25 cases)
+python3 kit/scripts/tests/test_gates.py                       # self-tests (23 cases)
 
 # good contract — every gate PASSes:
 python3 kit/scripts/validate_contract.py examples/contract.sample.json

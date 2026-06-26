@@ -30,7 +30,7 @@ each mapping back to the sources it satisfies via `covers`), `confidence`, `stat
 python3 "$ADK/scripts/validate_contract.py" <contract.json>
 ```
 Exit 0 means the contract is structurally complete and contains **no placeholder tokens**
-(`略`, `TODO`, `TBD`, …). Do not advance until it passes.
+(`TODO`, `TBD`, `FIXME`, …). Do not advance until it passes.
 
 ## Steps
 1. Write `intent` as one tight paragraph (problem + goal). No solutioning yet.

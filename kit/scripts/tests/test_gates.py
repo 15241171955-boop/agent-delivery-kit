@@ -50,24 +50,14 @@ class GateTests(unittest.TestCase):
         d = copy.deepcopy(self.c); d["intent"] = "too short"
         self.assertFalse(validate_contract.check(d)[0])
 
-    # --- ① CJK fixes (review items #3) ---
-    def test_validate_accepts_chinese_intent_without_spaces(self):
+    # --- ① non-space-delimited intent length, exercised via code points (no literal CJK) ---
+    def test_validate_accepts_non_space_script_intent(self):
         d = copy.deepcopy(self.c)
-        d["intent"] = "本次变更为销售订单列表增加批量导出能力并完善权限校验策略以确保数据安全"
+        d["intent"] = "".join(chr(0x4E00 + i) for i in range(12))  # 12 CJK code points
         self.assertTrue(validate_contract.check(d)[0],
-                        msg="space-free Chinese intent must not be judged too short")
+                        msg="a non-space-delimited intent must not be judged too short")
 
-    def test_validate_allows_lue_inside_a_real_word(self):
-        d = copy.deepcopy(self.c)
-        d["acceptance"][0]["statement"] = "导出时应用脱敏策略，省略内部字段"  # 策略 / 省略 contain 略
-        self.assertTrue(validate_contract.check(d)[0],
-                        msg="略 inside normal words must not be flagged as a placeholder")
-
-    def test_validate_flags_standalone_lue(self):
-        d = copy.deepcopy(self.c); d["acceptance"][0]["statement"] = "略"
-        self.assertFalse(validate_contract.check(d)[0])
-
-    # --- ① type/consistency hardening (review P1 #2) ---
+    # --- ① type/consistency hardening ---
     def test_validate_rejects_must_cover_string(self):
         d = copy.deepcopy(self.c); d["sources"][0]["must_cover"] = "true"
         self.assertFalse(validate_contract.check(d)[0])
@@ -111,7 +101,7 @@ class GateTests(unittest.TestCase):
         self.assertFalse(gate_check.check(d)[0])
 
     def test_gate_check_rejects_faked_review_with_bad_coverage(self):
-        # Review item #2: faking status:reviewed must not bypass coverage.
+        # Faking status:reviewed must not bypass coverage.
         d = copy.deepcopy(self.c)
         d["status"] = "reviewed"
         d["sources"].append({"id": "uncovered-src", "ref": "y", "must_cover": True})
@@ -119,7 +109,7 @@ class GateTests(unittest.TestCase):
 
     # --- ④ dod_check enforces real completion AND pipeline progress ---
     def test_dod_rejects_draft_with_green_evidence(self):
-        # Review item #1: status:draft with all-green evidence must NOT pass dod_check.
+        # status:draft with all-green evidence must NOT pass dod_check.
         d = copy.deepcopy(self.c); d["status"] = "draft"
         self.assertFalse(dod_check.check(d)[0])
 

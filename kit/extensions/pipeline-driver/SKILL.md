@@ -50,6 +50,5 @@ contract's own `status` field is the durable source of progress; the runtime fil
 The driver may report success **only** when `dod_check.py` exits 0 for the contract. Any other
 outcome is reported as `needs-review` or `blocked`, with the exact failing reasons surfaced.
 
-> This is the de-scoped, stack-agnostic descendant of a production "loop engineering driver" that
-> orchestrated dozens of skills behind hard gates. Kept here to one job: sequence the four stages
-> honestly.
+> Kept deliberately tiny: this orchestrator does exactly one job — sequence the four stages
+> honestly behind their gates — and adds no logic of its own.

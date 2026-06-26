@@ -13,7 +13,7 @@ The gate scripts in `kit/scripts/` encode these rules as constants and enforce t
 | Field | Type | Required | Meaning |
 |-------|------|----------|---------|
 | `id` | string (kebab-case) | ✅ | Unique change id, e.g. `add-export-button`. |
-| `intent` | string (≥10 words / CJK chars) | ✅ | One paragraph: the problem and the goal. Length is measured CJK-aware, so a space-free Chinese intent is fine. |
+| `intent` | string (≥10 words / CJK chars) | ✅ | One paragraph: the problem and the goal. Length is counted script-aware (each CJK character = one unit), so non-space-delimited scripts aren't rejected. |
 | `sources` | list&lt;source&gt; | ✅ | Reference material the contract must faithfully cover. |
 | `entities` | list&lt;entity&gt; | ✅ | The things being created or changed. |
 | `acceptance` | list&lt;criterion&gt; | ✅ | Testable acceptance criteria. |
@@ -43,14 +43,13 @@ The gate scripts in `kit/scripts/` encode these rules as constants and enforce t
 
 ## Forbidden placeholders
 
-To prevent fake completeness, `validate_contract.py` rejects a contract containing any of:
+To prevent fake completeness, `validate_contract.py` rejects a contract that contains any of these
+placeholder markers as a substring of any string value:
 
-- **Latin markers (substring match):** `TODO`, `TBD`, `FIXME`, `<...>`, `???`
-- **Omission markers:** `（略）` / `(略)` anywhere, or a field whose **entire value** is `略`.
+`TODO`   `TBD`   `FIXME`   `<...>`   `???`
 
-The bare character `略` is flagged **only** as a standalone value, so ordinary words that contain it
-(`策略`, `战略`, `忽略`, `省略`) are not falsely rejected. Intent length is measured in a CJK-aware way,
-so a space-free Chinese `intent` is not mistaken for "too short".
+Intent length is counted in a script-aware way (each CJK character counts as one unit), so an
+`intent` written in a non-space-delimited script is not mistaken for "too short".
 
 ## Status lifecycle
 

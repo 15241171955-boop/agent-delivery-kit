@@ -8,7 +8,7 @@
     { "name": "Thing", "kind": "model" }
   ],
   "acceptance": [
-    { "id": "ac-1", "statement": "略", "testable": false, "covers": [], "passed": false }
+    { "id": "ac-1", "statement": "TODO fill this in", "testable": false, "covers": [], "passed": false }
   ],
   "confidence": "explicit",
   "status": "draft",

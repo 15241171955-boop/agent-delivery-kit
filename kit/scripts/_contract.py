@@ -11,12 +11,9 @@ CONFIDENCE_VALUES = ("explicit", "suggest", "fallback")
 STATUS_ORDER = ("draft", "reviewed", "applied", "verified")
 MIN_INTENT_UNITS = 10
 
-# Placeholder detection (invariant: no fake completeness).
-# Latin markers are matched as substrings; they do not occur inside normal prose.
-FORBIDDEN_SUBSTRINGS = ("TODO", "TBD", "FIXME", "<...>", "???", "（略）", "(略)")
-# CJK omission marker. Matched ONLY as a standalone value so legitimate words that merely
-# contain the character (策略, 战略, 忽略, …) are not falsely rejected.
-OMISSION_EXACT = ("略",)
+# Placeholder detection (invariant: no fake completeness). Matched as substrings;
+# these markers do not occur inside normal prose.
+FORBIDDEN_SUBSTRINGS = ("TODO", "TBD", "FIXME", "<...>", "???")
 
 _KEBAB = re.compile(r"^[a-z0-9]+(-[a-z0-9]+)*$")
 
@@ -40,11 +37,12 @@ def _is_cjk(ch):
 
 
 def text_units(text):
-    """Length metric that works for space-separated and CJK scripts alike.
+    """Length metric that works for space-separated and non-space scripts alike.
 
     Each CJK character counts as one unit; runs of non-CJK text are counted as
-    whitespace-separated words. So '增加批量导出能力' (8 chars) -> 8 units, and
-    'add a CSV export' -> 4 units. Avoids rejecting Chinese intents that have no spaces.
+    whitespace-separated words. So a 12-character CJK string scores 12, and
+    'add a CSV export' scores 4 — an intent in a non-space-delimited script is
+    not rejected as "too short".
     """
     if not isinstance(text, str):
         return 0
@@ -72,8 +70,6 @@ def find_placeholders(contract):
         for tok in FORBIDDEN_SUBSTRINGS:
             if tok in s:
                 hits.add(tok)
-        if s.strip() in OMISSION_EXACT:
-            hits.add(s.strip())
     return sorted(hits)
 
 

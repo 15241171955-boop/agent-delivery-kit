@@ -1,6 +1,6 @@
 # Spec-Gated Delivery: a reusable workflow for shipping with AI agents
 
-*A method distilled from a 69-skill production agent system, reduced to a stack-agnostic core.*
+*A reusable, stack-agnostic method for shipping work with AI agents through script-gated stages.*
 
 ## 1. The problem: agentic delivery drifts
 
@@ -36,7 +36,7 @@ chat history. Design and implementation are decoupled the way a mould is decoupl
 [`kit/shared/contract-schema.md`](../kit/shared/contract-schema.md)). The contract lists the
 `sources` that must be covered, the `entities` being changed, and `acceptance` criteria that are
 each *testable* and each mapped back to the sources they satisfy. **Gate:** `validate_contract.py`
-— structurally complete, and containing none of the placeholder tokens (`TODO`, `略`, `TBD`, …) that
+— structurally complete, and containing none of the placeholder tokens (`TODO`, `TBD`, `FIXME`, …) that
 are how "fake completeness" sneaks in.
 
 **② Review.** Before any code, check that the contract faithfully covers its sources and is
@@ -85,7 +85,7 @@ skipped. That one refusal eliminates the most common way agentic work is silentl
 Models default to completeness *theatre*: a section labelled "(omitted for brevity)," an acceptance
 criterion marked done because it was *probably* done. Two mechanisms in the kit counter this. First,
 **forbidden placeholder tokens** — `validate_contract.py` fails any contract containing `TODO`,
-`略`, `TBD`, `FIXME`, and friends, so you cannot ship a hollow spec. Second, **machine-judged DoD** —
+`TBD`, `FIXME`, `<...>`, and friends, so you cannot ship a hollow spec. Second, **machine-judged DoD** —
 completion is computed from evidence fields, not asserted. Neither relies on the model's goodwill.
 
 ## 7. Governance: the dual-track pattern (optional)

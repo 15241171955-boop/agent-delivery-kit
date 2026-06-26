@@ -35,5 +35,5 @@ reference each other.
    in their `dod_check` evidence.
 3. Keep everything else identical — same four stages, same gates.
 
-> This is the de-scoped version of the "two OpenSpec workspaces" idea from the system this kit was
-> distilled from: one workspace for business change, one for agent-capability change.
+> In practice: keep one workspace for business change and one for agent-capability change — they
+> evolve at different rates and shouldn't share a review queue.
