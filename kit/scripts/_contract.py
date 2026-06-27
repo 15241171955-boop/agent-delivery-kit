@@ -11,9 +11,16 @@ CONFIDENCE_VALUES = ("explicit", "suggest", "fallback")
 STATUS_ORDER = ("draft", "reviewed", "applied", "verified")
 MIN_INTENT_UNITS = 10
 
-# Placeholder detection (invariant: no fake completeness). Matched as substrings;
-# these markers do not occur inside normal prose.
-FORBIDDEN_SUBSTRINGS = ("TODO", "TBD", "FIXME", "<...>", "???")
+# Placeholder detection (invariant: no fake completeness). Two layers:
+#  - symbol markers matched literally (they don't occur in normal prose);
+#  - word markers matched case-insensitively on word boundaries, so they fire on
+#    "TODO" / "to-do" / "WiP" but not inside ordinary words ("widow", "boxxx").
+# This is a smoke detector for honest "completeness theatre", not an adversarial
+# defence: a model set on faking can still write vacuous-but-clean prose. Judging
+# whether the content is *real* is the reviewer's / `coverage --strict` job.
+FORBIDDEN_SUBSTRINGS = ("<...>", "???", "<placeholder>")
+_PLACEHOLDER_WORD_RE = re.compile(r"(?i)\b(todo|to-do|tbd|fixme|wip|xxx|placeholder)\b")
+_PLACEHOLDER_PHRASE_RE = re.compile(r"(?i)lorem\s+ipsum")
 
 _KEBAB = re.compile(r"^[a-z0-9]+(-[a-z0-9]+)*$")
 
@@ -84,6 +91,10 @@ def find_placeholders(contract):
         for tok in FORBIDDEN_SUBSTRINGS:
             if tok in s:
                 hits.add(tok)
+        for m in _PLACEHOLDER_WORD_RE.findall(s):
+            hits.add(m.upper())
+        if _PLACEHOLDER_PHRASE_RE.search(s):
+            hits.add("LOREM IPSUM")
     return sorted(hits)
 
 

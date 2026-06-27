@@ -26,6 +26,18 @@ Exit 0 ⟺ all acceptance `passed`, `tasks_open == 0`, and `tests.passed && !tes
 On exit 0, set `status: "verified"`. On non-zero, the only terminal states are `needs-review`
 or `blocked`.
 
+### Measured mode (do not let the agent write its own evidence)
+The check above reads evidence fields the contract author wrote. The honest path is to have a
+**runner** produce them and refuse anything it didn't attest — this is what CI should run:
+```bash
+python3 "$ADK/scripts/record_evidence.py" <contract.json> --test-command "<your suite>" --verify
+python3 "$ADK/scripts/dod_check.py"        <contract.json> --require-measured
+```
+`record_evidence.py` runs the suite, writes `tests`/`acceptance[].passed` from the real exit code,
+and stamps `evidence.source: "runner"`; `--require-measured` then rejects self-attested or
+tampered evidence. As the implementing agent, **you do not hand-write `tests.passed` or set
+`evidence` — the runner does.**
+
 ## Hard rule
 While `dod_check.py` is red, **do not** emit "done / fixed / shipped / closed the loop". A skipped
 or absent test suite counts as **not verified**. This rule exists because optimistic completion

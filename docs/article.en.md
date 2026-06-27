@@ -110,9 +110,16 @@ before merge). The full checklist is in
 This is overhead. For a one-line throwaway script or a spike you'll delete tomorrow, the ceremony
 costs more than it saves — skip it. The kit earns its keep when work is shared across people or
 sessions, when "done" has consequences, and when you're delegating real implementation to an agent.
-It is also only as honest as the evidence fed into the contract: `dod_check` trusts that
-`tests.passed` reflects a real run. Keep the gap between the evidence and reality small — ideally by
-having CI, not the model, write those fields.
+
+The gate is only as honest as the evidence it reads. By default `dod_check` trusts that
+`tests.passed` reflects a real run — fine locally, but the model wrote that field. **Measured mode**
+removes the trust: `record_evidence.py` (run by CI) executes the suite, writes the evidence from the
+real exit code, and stamps `evidence.source: "runner"`; `dod_check --require-measured` then refuses
+anything the runner didn't attest. That converts the headline claim — "the model cannot self-certify"
+— from a convention into something a required CI check enforces. The residual limit is the universal
+one: a runner pointed at a vacuous suite will faithfully certify vacuity. The script can guarantee a
+real run happened; it cannot guarantee the tests were *worth* running — that judgement, like semantic
+coverage (`coverage_gate --strict`), stays with a human reviewer by design.
 
 ---
 

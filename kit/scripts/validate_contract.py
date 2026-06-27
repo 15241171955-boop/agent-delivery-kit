@@ -125,6 +125,24 @@ def check(contract):
                 if k in t and not isinstance(t[k], bool):
                     reasons.append("tests.%s must be a boolean" % k)
 
+    # --- optional measured-mode blocks: light shape checks only when present ---
+    if "verification" in contract:
+        v = contract["verification"]
+        if not isinstance(v, dict):
+            reasons.append("verification must be an object")
+        else:
+            tc = v.get("test_command")
+            if tc is not None and not (_non_empty_string(tc)
+                                       or (isinstance(tc, list) and tc
+                                           and all(_non_empty_string(x) for x in tc))):
+                reasons.append("verification.test_command must be a non-empty string or list of strings")
+            if "acceptance_commands" in v and not isinstance(v["acceptance_commands"], dict):
+                reasons.append("verification.acceptance_commands must be an object {acceptance_id: command}")
+    if "evidence" in contract and not isinstance(contract["evidence"], dict):
+        reasons.append("evidence must be an object")
+    if "review" in contract and not isinstance(contract["review"], dict):
+        reasons.append("review must be an object")
+
     placeholders = c.find_placeholders(contract)
     if placeholders:
         reasons.append("forbidden placeholder tokens present: %s" % placeholders)

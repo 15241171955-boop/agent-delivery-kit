@@ -3,7 +3,7 @@
 **Spec-Gated Delivery** — a stack-agnostic, zero-dependency way to ship work with AI agents through
 four script-judged gates, so "done" is a fact a script checks, not a claim the model makes.
 
-![Gate dashboard](https://raw.githubusercontent.com/15241171955-boop/agent-delivery-kit/main/docs/assets/dashboard.png)
+![Gate dashboard](https://raw.githubusercontent.com/SinboBoop/agent-delivery-kit/main/docs/assets/dashboard.png)
 
 ## Highlights
 
@@ -25,7 +25,7 @@ four script-judged gates, so "done" is a fact a script checks, not a claim the m
 ## Quickstart
 
 ```bash
-git clone https://github.com/15241171955-boop/agent-delivery-kit
+git clone https://github.com/SinboBoop/agent-delivery-kit
 cd agent-delivery-kit
 export ADK="$PWD/kit"
 python3 -m unittest discover -s "$ADK/scripts/tests" -p "test_*.py"    # 41 tests, zero deps

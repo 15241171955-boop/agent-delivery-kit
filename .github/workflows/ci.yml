@@ -39,3 +39,36 @@ jobs:
         run: |
           python3 kit/scripts/run_pipeline.py examples/contract.sample.json
           ! python3 kit/scripts/run_pipeline.py examples/contract.bad.json --quiet
+
+      - name: Strict coverage (substantive + reviewer two-key)
+        run: python3 kit/scripts/coverage_gate.py examples/measured/contract.applied.json --strict
+
+  # Measured mode: the *runner* writes the evidence, not the model. This is the half that
+  # turns "the gate is deterministic" into "and the evidence is real". Make the final
+  # `dod_check --require-measured` a required status check in branch protection so a PR
+  # cannot merge until a genuine run has stamped the contract.
+  measured:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.x"
+
+      - name: A self-attested contract is rejected (no runner evidence)
+        run: |
+          ! python3 kit/scripts/dod_check.py examples/measured/contract.applied.json --require-measured
+          ! python3 kit/scripts/dod_check.py examples/contract.sample.json --require-measured
+
+      - name: Runner records real evidence, then DoD verifies
+        run: |
+          cp examples/measured/contract.applied.json "$RUNNER_TEMP/c.json"
+          python3 kit/scripts/record_evidence.py "$RUNNER_TEMP/c.json" --verify
+          python3 kit/scripts/dod_check.py "$RUNNER_TEMP/c.json" --require-measured
+
+      - name: A failing suite cannot be rounded up to done
+        run: |
+          cp examples/measured/contract.applied.json "$RUNNER_TEMP/fail.json"
+          ! python3 kit/scripts/record_evidence.py "$RUNNER_TEMP/fail.json" --verify \
+              --test-command "python3 -c \"import sys; sys.exit(1)\""
+          ! python3 kit/scripts/dod_check.py "$RUNNER_TEMP/fail.json" --require-measured

@@ -21,6 +21,9 @@ The gate scripts in `kit/scripts/` encode these rules as constants and enforce t
 | `status` | enum | ✅ | `draft` → `reviewed` → `applied` → `verified`. |
 | `tasks_open` | int | for ④ | Count of execution items not yet closed. |
 | `tests` | object | for ④ | `{ "passed": bool, "skipped": bool }`. |
+| `verification` | object | for measured ④ | How to *measure* done: `{ "test_command": "pytest -q", "acceptance_commands": { "ac-1": "…" } }`. Run by `record_evidence.py`, not the model. |
+| `evidence` | object | stamped by runner | Provenance of the evidence: `{ "source": "runner", "recorded_at": "…", "test_command": "…", "test_returncode": 0 }`. Required under `dod_check --require-measured`. |
+| `review` | object | for `coverage --strict` | Reviewer two-key: `{ "coverage_substantive": true, "by": "alice" }`. The implementing model may not set this for itself. |
 
 ### `source`
 ```
@@ -41,12 +44,31 @@ The gate scripts in `kit/scripts/` encode these rules as constants and enforce t
   decides whether every `must_cover` source is addressed.
 - `passed` is set true only when verified with evidence (used by `dod_check.py`).
 
+## Declared vs. measured evidence
+
+By default the ④ gate reads the evidence fields (`tests`, `acceptance[].passed`) as **declared** —
+whoever wrote the contract set them. That is enough for local iteration but trusts the author. In
+**measured mode**, `record_evidence.py` (run by CI, not the model) executes `verification.test_command`,
+overwrites the evidence fields from the real exit code, and stamps an `evidence` block with
+`source: "runner"`. `dod_check.py --require-measured` then refuses any contract that lacks runner
+provenance or whose `tests.passed` no longer matches the recorded `test_returncode`. Command
+precedence is `--test-command` > `$ADK_TEST_COMMAND` > `verification.test_command`, so CI controls
+what executes. See [`../../examples/measured/`](../../examples/measured/).
+
+`coverage_gate.py --strict` applies the same separation to review: each `must_cover` source needs a
+substantive, testable criterion, and `review.coverage_substantive` must be set true by a reviewer —
+never by the implementing model.
+
 ## Forbidden placeholders
 
 To prevent fake completeness, `validate_contract.py` rejects a contract that contains any of these
-placeholder markers as a substring of any string value:
+placeholder markers in any string value (symbols matched literally; words matched
+case-insensitively on word boundaries):
 
-`TODO`   `TBD`   `FIXME`   `<...>`   `???`
+`TODO`   `TO-DO`   `TBD`   `FIXME`   `WIP`   `XXX`   `PLACEHOLDER`   `lorem ipsum`   `<...>`   `???`
+
+This is a smoke detector for honest "completeness theatre", not an adversarial defence — judging
+whether present content is *real* is the reviewer's / `coverage --strict` job.
 
 Intent length is counted in a script-aware way (each CJK character counts as one unit), so an
 `intent` written in a non-space-delimited script is not mistaken for "too short".

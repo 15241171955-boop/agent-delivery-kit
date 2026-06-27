@@ -1,0 +1,21 @@
+{
+  "id": "measured-demo-export",
+  "intent": "Demonstrate measured-mode verification: the suite result is produced by record_evidence.py in CI, not asserted by the model, so dod_check --require-measured can trust it. The contract ships at status applied with no real evidence yet.",
+  "sources": [
+    { "id": "prd-1", "ref": "docs/prd.md#export", "must_cover": true }
+  ],
+  "entities": [
+    { "name": "ExportButton", "kind": "ui-action", "fields": ["label", "scope"] }
+  ],
+  "acceptance": [
+    { "id": "ac-1", "statement": "The list view exposes an Export action that downloads the currently filtered rows as a CSV file", "testable": true, "covers": ["prd-1"], "passed": false }
+  ],
+  "confidence": "explicit",
+  "status": "applied",
+  "tasks_open": 0,
+  "tests": { "passed": false, "skipped": true },
+  "verification": {
+    "test_command": "python3 -c \"import sys; sys.exit(0)\""
+  },
+  "review": { "coverage_substantive": true, "by": "reviewer" }
+}

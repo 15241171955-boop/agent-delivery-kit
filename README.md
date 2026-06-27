@@ -1,6 +1,6 @@
 # agent-delivery-kit
 
-[![gates](https://github.com/15241171955-boop/agent-delivery-kit/actions/workflows/ci.yml/badge.svg)](https://github.com/15241171955-boop/agent-delivery-kit/actions/workflows/ci.yml) ![license](https://img.shields.io/badge/license-MIT-blue) ![python](https://img.shields.io/badge/python-3.x-blue) ![deps](https://img.shields.io/badge/deps-zero-brightgreen) ![skills](https://img.shields.io/badge/SKILL.md-compatible-blue)
+[![gates](https://github.com/SinboBoop/agent-delivery-kit/actions/workflows/ci.yml/badge.svg)](https://github.com/SinboBoop/agent-delivery-kit/actions/workflows/ci.yml) ![license](https://img.shields.io/badge/license-MIT-blue) ![python](https://img.shields.io/badge/python-3.x-blue) ![deps](https://img.shields.io/badge/deps-zero-brightgreen) ![skills](https://img.shields.io/badge/SKILL.md-compatible-blue)
 
 > **Spec-Gated Delivery** — a stack-agnostic, reusable workflow for shipping work with AI agents through four gated stages, where every gate is judged by a deterministic script, not by the model's own say-so.
 
@@ -47,10 +47,10 @@ agent-delivery-kit/
 │   ├── skills/   # specify · review · apply · verify (portable SKILL.md)
 │   ├── shared/   # contract schema, rule sources, definition of done
 │   ├── commands/ # thin entrypoints
-│   ├── scripts/  # 4 gate scripts + run_pipeline orchestrator + stdlib tests (Python 3, zero deps)
+│   ├── scripts/  # 4 gate scripts + record_evidence + run_pipeline + stdlib tests (Python 3, zero deps)
 │   ├── extensions/  # optional: dual-track governance, pipeline-driver
 │   └── context-map.yaml
-└── examples/     # sample + bad contract, and worked feature / bug-fix walkthroughs
+└── examples/     # sample + bad contract, worked feature / bug-fix, and a measured-mode walkthrough
 ```
 
 ## Quickstart
@@ -110,6 +110,34 @@ The terminal prints a status board; `report.html` is a shareable gate dashboard 
 picked up, and the run stops as soon as every gate is green. New here? walk a full feature or bug fix
 in [`examples/`](examples/), and read [`docs/cookbook.md`](docs/cookbook.md) for contract best
 practices and how to extend the gates.
+
+## Trustworthy completion: declared vs. measured evidence
+
+A gate is only as honest as the evidence it reads. `dod_check.py` checks fields like
+`tests.passed` — and by default those fields are *declared* (whoever wrote the contract set
+them). That's fine for local iteration, but the model could write `tests.passed: true` without a
+real run. **Measured mode** closes that gap by moving evidence production out of the model:
+
+```bash
+# CI (not the model) runs the suite and stamps real evidence onto the contract...
+python3 "$ADK/scripts/record_evidence.py" contract.json --test-command "pytest -q" --verify
+#   → runs the command, writes tests/acceptance from the real exit code, adds evidence.source=runner
+# ...then the DoD gate refuses anything the runner didn't attest:
+python3 "$ADK/scripts/dod_check.py" contract.json --require-measured
+```
+
+`--require-measured` rejects a contract unless its evidence carries `source: "runner"` and the
+`tests.passed` value still agrees with the recorded return code — so a self-attested or
+after-the-fact-edited contract cannot pass. Command resolution is `--test-command` >
+`$ADK_TEST_COMMAND` > `verification.test_command`, so **CI pins what runs**, not the contract.
+Make the `dod_check --require-measured` step a required status check and the gate becomes real
+enforcement, not advice. Worked end to end in [`examples/measured/`](examples/measured/).
+
+For the review stage, `coverage_gate.py --strict` adds the same idea to coverage: every
+`must_cover` source needs a *substantive, testable* criterion, plus a reviewer two-key
+(`review.coverage_substantive`) the implementing model may not set for itself. A script can prove
+a source is *referenced*; it can't prove the coverage is *faithful* — that judgement stays with a
+human or a separate reviewer, by design.
 
 ## How this differs
 
